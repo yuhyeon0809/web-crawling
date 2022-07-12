@@ -21,37 +21,33 @@ def write_csv(item_list_xlsx, imgPath, writer):
  
     row_max = ws.max_row # 최대행값 저장
 
-    for r in range(25, row_max+1):
+    for r in range(2, row_max+1):
         categories = []
-        search = str(ws.cell(row=r, column=1).value)
-        print("search = "+ search)
+        type = str(ws.cell(row=r, column=1).value)
+        search = str(ws.cell(row=r, column=2).value)
+        if search == 'None':
+            continue
+        search_include = str(ws.cell(row=r, column=3).value).split(', ')
+        search_except = str(ws.cell(row=r, column=4).value).split(', ')
+        max_item = int(str(ws.cell(row=r, column=6).value)[5:-1])
 
-        for c in range(3, ws.max_column+1):
+        for c in range(7, ws.max_column+1):
             category = str(ws.cell(r, c).value)
             print(category)
             if category == 'None':
                 continue
             categories.append(category)
-        print(categories)
+
         for category in categories:
             index = str(category).find('(')
             category = category[1:index]
             try:
                 cid = toCid[category]
-                print("category = " + category + " cid = " + cid)
             except:
                 print(category + "---unknown category!")
                 continue
 
-            pageUrl = "https://www.daisomall.co.kr/shop/search.php?search_text={}&cid={}&depth=1&list_type=&sub_list_type=&max=50".format(search, cid)
-            pageRes = requests.get(pageUrl)
-            pageRes.raise_for_status()
-            pageSoup = BeautifulSoup(pageRes.text, "lxml")
-            try:
-                max_item = int(pageSoup.find("span", {"class": "font_normal size_16"}).text)
-                max_page = int(max_item/50) + 1
-            except:
-                continue
+            max_page = int(max_item/50) + 1
 
             for page in range(1, max_page+1): 
                 print(page)
@@ -71,6 +67,7 @@ def write_csv(item_list_xlsx, imgPath, writer):
                         continue
                     if itemName.find("밀크북") != -1:
                         continue
+
                     itemName = itemName.replace("<b>", '')
                     itemName = itemName.replace("</b>", '')
                     print(itemName)
@@ -130,10 +127,10 @@ def csvtoxlsx(filename_csv, filename_xlsx):
 # main 함수
 if __name__ == "__main__":
     
-    item_list_xlsx = "../item_category_list.xlsx"
-    filename_csv = "../item_category.csv"          # 결과를 저장할 csv 파일 이름
-    filename_xlsx = "../item_category.xlsx"        # 결과를 저장할 xlsx 파일 이름
-    imgPath = "../item_img/"                       # 이미지 파일이 저장될 경로
+    item_list_xlsx = "item_category_list.xlsx"
+    filename_csv = "item_category.csv"          # 결과를 저장할 csv 파일 이름
+    filename_xlsx = "item_category.xlsx"        # 결과를 저장할 xlsx 파일 이름
+    imgPath = "item_img/"                       # 이미지 파일이 저장될 경로
     
     f = open(filename_csv, "a", encoding="utf-8-sig", newline="")
     writer = csv.writer(f)

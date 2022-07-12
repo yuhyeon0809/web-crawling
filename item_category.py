@@ -40,7 +40,7 @@ def write_csv(item_list_xlsx, imgPath, writer):
 
         for category in categories:
             index = str(category).find('(')
-            category = category[1:index]
+            category = category[:index]
             try:
                 cid = toCid[category]
             except:
@@ -63,10 +63,20 @@ def write_csv(item_list_xlsx, imgPath, writer):
                     title = item.find('div', {"style": "margin-top:10px;height:38px;"})
 
                     itemName = title.find('a').get("title")
+                    flag = 0
                     if itemName.find("<b>") == -1:  # 상품명에 검색어가 포함되지 않은 항목 제외
-                        continue
+                        for word in search_include:
+                            if itemName.find(word) != -1:
+                                flag = 1
+                        if flag == 0:
+                            continue
                     if itemName.find("밀크북") != -1:
                         continue
+                    if itemName.find("양장") != -1:
+                        continue
+                    for word in search_except:
+                        if itemName.find(word) != -1:
+                            continue
 
                     itemName = itemName.replace("<b>", '')
                     itemName = itemName.replace("</b>", '')
@@ -106,7 +116,7 @@ def write_csv(item_list_xlsx, imgPath, writer):
                         itemCategories.append(itemCategory)
 
                     try:
-                        data = [None, search, (page-1)*50+i, itemNum, itemCategories[0]+">"+itemCategories[1]+">"+itemCategories[2], itemName, imgUrl, itemPrice]
+                        data = [type, search, (page-1)*50+i, itemNum, itemCategories[0]+">"+itemCategories[1]+">"+itemCategories[2], itemName, imgUrl, itemPrice]
                     except:
                         print("category error!")
                         continue
@@ -127,7 +137,7 @@ def csvtoxlsx(filename_csv, filename_xlsx):
 # main 함수
 if __name__ == "__main__":
     
-    item_list_xlsx = "item_category_list.xlsx"
+    item_list_xlsx = "item_category_list.xlsx"  # 읽어올 물품 리스트
     filename_csv = "item_category.csv"          # 결과를 저장할 csv 파일 이름
     filename_xlsx = "item_category.xlsx"        # 결과를 저장할 xlsx 파일 이름
     imgPath = "item_img/"                       # 이미지 파일이 저장될 경로

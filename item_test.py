@@ -19,17 +19,31 @@ def write_csv(item_list, imgPath, writer):
         search = search[2:-2]
         print(search)
 
-        for page in range(99, 122): 
+        pageUrl = "https://www.daisomall.co.kr/shop/search.php?nset=1&max=50&search_text={}&orderby=daiso_ranking1".format(search)
+        
+        pageRes = requests.get(pageUrl)
+        pageRes.raise_for_status()
+        
+        pageSoup = BeautifulSoup(pageRes.text, "lxml")
+        try:
+            max_item = int(pageSoup.find("span", {"class": "font_normal size_16"}).text)
+            max_page = int(max_item/50) + 1
+        except:
+            continue
+
+        for page in range(1, max_page+1): 
             print(page)
             # 크롤링 대상 url
+            # try:
             url = "https://www.daisomall.co.kr/shop/search.php?nset=1&page={}&max=50&search_text={}&orderby=daiso_ranking1".format(page, search)
-
+            # except:
+            # page = 300
+                # continue
             res = requests.get(url)
             res.raise_for_status()
 
             soup = BeautifulSoup(res.text, "lxml")
             items = soup.find_all("li", {"class": "float01 search_goods_list"})
-            # print(items)
 
             i = 1
             for item in items:
@@ -107,9 +121,8 @@ if __name__ == "__main__":
     filename_csv = "item_info.csv"  # 결과를 저장할 csv 파일 이름
     imgPath = "item_img/"           # 이미지 파일이 저장될 경로
 
-    f = open(filename_csv, "a", encoding="utf-8-sig", newline="")
+    f = open(filename_csv, "w", encoding="utf-8-sig", newline="")
     writer = csv.writer(f)
-
 
     # 컬럼 이름 지정
     columns_name = ["물품분류", "물품종", "순번", "상품번호", "카테고리", "상품명", "상품사진", "가격"] 
@@ -117,4 +130,5 @@ if __name__ == "__main__":
 
     item_list = read_list("item_list.xlsx")
     write_csv(item_list, imgPath, writer)
+    f.close()
     csvtoxlsx(filename_csv)

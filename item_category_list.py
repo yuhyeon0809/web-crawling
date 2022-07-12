@@ -5,7 +5,7 @@ import openpyxl as op
 import csv
 
 def read_list(list_xlsx):
-    df = pd.read_excel(list_xlsx, usecols = "A")
+    df = pd.read_excel(list_xlsx, usecols = ['검색어'], skiprows=[1])
     item_list = df.values.tolist()
     return item_list
 
@@ -36,21 +36,21 @@ def write_csv(item_list, writer):
             except:
                 break
 
-        data = [search, "총 상품 " + str(max_item) + "개"]
+        data = [None, None, None, None, None, "총 상품 " + str(max_item) + "개"]
         for i in range(0, len(categories)):
             data.append(categories[i])
 
         writer.writerow(data)
 
-def csvtoxlsx(filename_csv):
+def csvtoxlsx(filename_csv, filename_xlsx):
     wb = op.Workbook()
     ws = wb.active
     with open(filename_csv, 'r', encoding='utf8') as f:
         for row in csv.reader(f):
             ws.append(row)
-    wb.save('item_category_list.xlsx')
+    wb.save(filename_xlsx)
 
-    wb = op.load_workbook('item_category_list.xlsx') 
+    wb = op.load_workbook(filename_xlsx) 
     ws = wb.active
     ws.column_dimensions['A'].width = 15
     ws.column_dimensions['B'].width = 15
@@ -58,20 +58,20 @@ def csvtoxlsx(filename_csv):
     for i in range(0, 10):
         ws.column_dimensions[chr(67+i)].width = 20
 
-    wb.save('item_category_list.xlsx')
+    wb.save(filename_xlsx)
     
 
 if __name__ == "__main__":
 
     filename_csv = "item_category_list.csv"  # 결과를 저장할 csv 파일 이름
+    filename_xlsx = "item_category_list.xlsx"
 
-    f = open(filename_csv, "w", encoding="utf-8-sig", newline="")
-    writer = csv.writer(f)
+    # f = open(filename_csv, "w", encoding="utf-8-sig", newline="")
+    # writer = csv.writer(f)
 
 
-    # 컬럼 이름 지정
-    item_list = read_list("item_list.xlsx")
-    write_csv(item_list, writer)
-    f.close()
-    csvtoxlsx(filename_csv)
+    # item_list = read_list("item_list.xlsx")
+    # write_csv(item_list, writer)
+    # f.close()
+    csvtoxlsx(filename_csv, filename_xlsx)
         

@@ -37,6 +37,7 @@ def write_csv(item_list_xlsx, imgPath, writer):
                 continue
             categories.append(category)
 
+        num = 1
         for category in categories:
             index1 = category.find('(')
             index2 = category.find(')')
@@ -58,7 +59,6 @@ def write_csv(item_list_xlsx, imgPath, writer):
 
                 items = soup.find_all("li", {"class": "float01 search_goods_list"})
 
-                i = 1
                 for item in items:
                     title = item.find('div', {"style": "margin-top:10px;height:38px;"})
 
@@ -94,7 +94,7 @@ def write_csv(item_list_xlsx, imgPath, writer):
 
                     img = item.find('div', {"class": "goods_line_img"})
                     imgUrl = img.find('img').get('src')
-                    imgName = "{}{}.jpg".format(search, (page-1)*50+i)
+                    imgName = "{}{}.jpg".format(search, num)
 
                     # 물품 이미지 다운로드
                     urllib.request.urlretrieve(imgUrl, imgPath+imgName)
@@ -121,12 +121,12 @@ def write_csv(item_list_xlsx, imgPath, writer):
                         itemCategories.append(itemCategory)
 
                     try:
-                        data = [type, search, (page-1)*50+i, itemNum, itemCategories[0]+">"+itemCategories[1]+">"+itemCategories[2], itemName, imgUrl, itemPrice]
+                        data = [type, search, num, itemNum, itemCategories[0]+">"+itemCategories[1]+">"+itemCategories[2], itemName, imgUrl, itemPrice]
                     except:
                         print("category error!")
                         continue
                     writer.writerow(data)
-                    i+=1
+                    num+=1
 
 
 # csv파일을 엑셀파일로 변환

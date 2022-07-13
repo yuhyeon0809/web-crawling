@@ -2,7 +2,6 @@ import csv
 import requests 
 from bs4 import BeautifulSoup
 import openpyxl as op
-import pandas as pd
 import urllib.request
 
 toCid = {'수납/정리': '019000000000000',
@@ -21,17 +20,17 @@ def write_csv(item_list_xlsx, imgPath, writer):
  
     row_max = ws.max_row # 최대행값 저장
 
-    for r in range(2, row_max+1):
+    for r in range(2, row_max+1):  # 2행부터 마지막행까지 반복
         categories = []
-        type = str(ws.cell(row=r, column=1).value)
-        search = str(ws.cell(row=r, column=2).value)
+        type = str(ws.cell(row=r, column=1).value)  # 물품분류
+        search = str(ws.cell(row=r, column=2).value)  # 검색어
         if search == 'None':
             continue
-        search_include = str(ws.cell(row=r, column=3).value).split(', ')
-        search_except = str(ws.cell(row=r, column=4).value).split(', ')
-        max_item = int(str(ws.cell(row=r, column=6).value)[5:-1])
+        search_include = str(ws.cell(row=r, column=3).value).split(', ')    # 포함검색어
+        search_except = str(ws.cell(row=r, column=4).value).split(', ')     # 제외검색어
+        # max_item = int(str(ws.cell(row=r, column=6).value)[5:-1])           # 총 물품 개수
 
-        for c in range(7, ws.max_column+1):
+        for c in range(7, ws.max_column+1):  # 카테고리명 리스트에 저장
             category = str(ws.cell(r, c).value)
             print(category)
             if category == 'None':
@@ -39,17 +38,18 @@ def write_csv(item_list_xlsx, imgPath, writer):
             categories.append(category)
 
         for category in categories:
-            index = str(category).find('(')
-            category = category[:index]
+            index1 = category.find('(')
+            index2 = category.find(')')
+            itemNum = int(category[index1+1:index2].replace(',', ''))
+            categoryPage = int(itemNum/50) + 1
+            category = category[:index1]
             try:
                 cid = toCid[category]
             except:
                 print(category + "---unknown category!")
                 continue
 
-            max_page = int(max_item/50) + 1
-
-            for page in range(1, max_page+1): 
+            for page in range(1, categoryPage+1): 
                 print(page)
                 url = "https://www.daisomall.co.kr/shop/search.php?nset=1&page={}&max=50&search_text={}&orderby=daiso_ranking1&cid={}&depth=1".format(page, search, cid)
                 res = requests.get(url)
@@ -62,7 +62,7 @@ def write_csv(item_list_xlsx, imgPath, writer):
                 for item in items:
                     title = item.find('div', {"style": "margin-top:10px;height:38px;"})
 
-                    itemName = title.find('a').get("title")
+                    itemName = title.find('a').get("title")  # 상품명
                     flag = 0
                     if itemName.find("<b>") == -1:  # 상품명에 검색어가 포함되지 않은 항목 제외
                         for word in search_include:
@@ -70,16 +70,21 @@ def write_csv(item_list_xlsx, imgPath, writer):
                                 flag = 1
                         if flag == 0:
                             continue
+                    
+                    itemName = itemName.replace("<b>", '')
+                    itemName = itemName.replace("</b>", '')
+
                     if itemName.find("밀크북") != -1:
                         continue
                     if itemName.find("양장") != -1:
                         continue
+                    flag = 0
                     for word in search_except:
                         if itemName.find(word) != -1:
-                            continue
+                            flag = 1
+                    if flag == 1:
+                        continue
 
-                    itemName = itemName.replace("<b>", '')
-                    itemName = itemName.replace("</b>", '')
                     print(itemName)
 
                     price = item.find('div', {"style": "margin-top:12px;"})
@@ -142,7 +147,7 @@ if __name__ == "__main__":
     filename_xlsx = "item_category.xlsx"        # 결과를 저장할 xlsx 파일 이름
     imgPath = "item_img/"                       # 이미지 파일이 저장될 경로
     
-    f = open(filename_csv, "a", encoding="utf-8-sig", newline="")
+    f = open(filename_csv, "w", encoding="utf-8-sig", newline="")
     writer = csv.writer(f)
 
     # 컬럼 이름 지정

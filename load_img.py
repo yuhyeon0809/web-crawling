@@ -13,7 +13,10 @@ def loadImg(excel_path, image_path, result_file):
         search = str(ws.cell(row=r, column=2).value)
         num = str(ws.cell(row=r, column=3).value)
         file_name = search + num + ".jpg"   # 이미지 파일 이름 (물품종+순번.png)
-        img = Image(image_path + file_name) # 이미지 파일 객체화
+        try:
+            img = Image(image_path + file_name) # 이미지 파일 객체화
+        except:
+            continue
         img.width = 128                     # 이미지 크기 조정
         img.height = 130
         ws.add_image(img, "G"+str(r))       # G(r) 셀에 이미지 삽입
@@ -31,8 +34,8 @@ def loadImg(excel_path, image_path, result_file):
 # main 함수
 if __name__ == "__main__":
 
-    excel_path = "item_category_test.xlsx"           # 엑셀파일 경로
-    image_path = ""                    # 이미지 파일 경로
-    result_file = "item_category_result_test.xlsx"   # 결과를 저장할 파일 이름
+    excel_path = "촬영 대상 물품_v0.1 다이소몰 크롤링 결과 리스트.xlsx"           # 엑셀파일 경로
+    image_path = "item_img/"                    # 이미지 파일 경로
+    result_file = "촬영 대상 물품_v0.1 다이소몰 크롤링 결과 리스트vv.xlsx"   # 결과를 저장할 파일 이름
 
     loadImg(excel_path, image_path, result_file)

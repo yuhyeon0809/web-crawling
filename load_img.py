@@ -31,8 +31,8 @@ def loadImg(excel_path, image_path, result_file):
 # main 함수
 if __name__ == "__main__":
 
-    excel_path = "item_category.xlsx"           # 엑셀파일 경로
-    image_path = "item_img/"                    # 이미지 파일 경로
-    result_file = "item_category_result.xlsx"   # 결과를 저장할 파일 이름
+    excel_path = "item_category_test.xlsx"           # 엑셀파일 경로
+    image_path = ""                    # 이미지 파일 경로
+    result_file = "item_category_result_test.xlsx"   # 결과를 저장할 파일 이름
 
     loadImg(excel_path, image_path, result_file)

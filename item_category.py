@@ -3,7 +3,9 @@ import requests
 from bs4 import BeautifulSoup
 import openpyxl as op
 import urllib.request
+import pandas as pd
 
+# cid(카테고리 id 정의)
 toCid = {'수납/정리': '019000000000000',
         '주방/욕실/청소': '020000000000000',
         '가구/인테리어': '022000000000000',
@@ -13,32 +15,35 @@ toCid = {'수납/정리': '019000000000000',
         '다이소 매장상품': '010000000000000',
         '포장재 전문관': '027000000000000'}
 
-def write_csv(item_list_xlsx, imgPath, writer):
+def write_data(item_list_xlsx, filename_xlsx, imgPath):
 
-    wb = op.load_workbook(item_list_xlsx) # 엑셀파일 열기
-    ws = wb.active
- 
-    row_max = ws.max_row # 최대행값 저장
+    input_wb = op.load_workbook(item_list_xlsx) # 엑셀파일 열기
+    input_ws = input_wb.active
+    row_max = input_ws.max_row # 최대행값 저장
+
+    output_wb = op.load_workbook(filename_xlsx)
+    output_ws = output_wb.active
 
     for r in range(2, row_max+1):  # 2행부터 마지막행까지 반복
         categories = []
-        type = str(ws.cell(row=r, column=1).value)  # 물품분류
-        search = str(ws.cell(row=r, column=2).value)  # 검색어
+        type = str(input_ws.cell(row=r, column=1).value)  # 물품분류
+        search = str(input_ws.cell(row=r, column=2).value)  # 검색어
         if search == 'None':
             continue
-        search_include = str(ws.cell(row=r, column=3).value).split(', ')    # 포함검색어
-        search_except = str(ws.cell(row=r, column=4).value).split(', ')     # 제외검색어
+        search_include = str(input_ws.cell(row=r, column=3).value).split(', ')    # 포함단어
+        search_except = str(input_ws.cell(row=r, column=4).value).split(', ')     # 제외단어
         # max_item = int(str(ws.cell(row=r, column=6).value)[5:-1])           # 총 물품 개수
 
-        for c in range(7, ws.max_column+1):  # 카테고리명 리스트에 저장
-            category = str(ws.cell(r, c).value)
-            print(category)
+        for c in range(7, input_ws.max_column+1):  # 카테고리명 리스트에 저장
+            category = str(input_ws.cell(r, c).value)
             if category == 'None':
                 continue
             categories.append(category)
 
+        print("----------" + search + "----------")
+
         num = 1
-        for category in categories:
+        for category in categories:  # 해당 검색어의 카테고리 하나씩 탐색
             index1 = category.find('(')
             index2 = category.find(')')
             itemNum = int(category[index1+1:index2].replace(',', ''))
@@ -50,7 +55,9 @@ def write_csv(item_list_xlsx, imgPath, writer):
                 print(category + "---unknown category!")
                 continue
 
-            for page in range(1, categoryPage+1): 
+            print("----------" + category + "----------")
+            
+            for page in range(1, categoryPage+1):  # 1페이지부터 마지막 페이지까지 반복
                 print(page)
                 url = "https://www.daisomall.co.kr/shop/search.php?nset=1&page={}&max=50&search_text={}&orderby=daiso_ranking1&cid={}&depth=1".format(page, search, cid)
                 res = requests.get(url)
@@ -125,35 +132,29 @@ def write_csv(item_list_xlsx, imgPath, writer):
                     except:
                         print("category error!")
                         continue
-                    writer.writerow(data)
+                    output_ws.append(data)
+                    output_wb.save(filename_xlsx)
                     num+=1
 
-
-# csv파일을 엑셀파일로 변환
-def csvtoxlsx(filename_csv, filename_xlsx):
-    wb = op.Workbook()
-    ws = wb.active
-    with open(filename_csv, 'r', encoding='utf8') as f:
-        for row in csv.reader(f):
-            ws.append(row)
-    wb.save(filename_xlsx)
-
+# 중복 행 제거
+def drop_duplicates(filename_xlsx):
+    df = pd.read_excel(filename_xlsx, engine='openpyxl')  # 엑셀파일 읽어오기
+    df = df.drop_duplicates(subset='상품번호')  # 중복 행 제거
+    df.to_excel(filename_xlsx, index=False)
 
 # main 함수
 if __name__ == "__main__":
     
-    item_list_xlsx = "item_category_list.xlsx"  # 읽어올 물품 리스트
-    filename_csv = "item_category.csv"          # 결과를 저장할 csv 파일 이름
-    filename_xlsx = "item_category.xlsx"        # 결과를 저장할 xlsx 파일 이름
+    item_list_xlsx = "촬영 대상 물품_v0.1 다이소몰 크롤링 목록.xlsx"  # 읽어올 물품 리스트
+    filename_xlsx = "촬영 대상 물품_v0.1 다이소몰 크롤링 결과 리스트.xlsx"        # 결과를 저장할 xlsx 파일 이름
     imgPath = "item_img/"                       # 이미지 파일이 저장될 경로
-    
-    f = open(filename_csv, "w", encoding="utf-8-sig", newline="")
-    writer = csv.writer(f)
+    columns_name = ["물품분류", "물품종", "순번", "상품번호", "카테고리", "상품명", "상품사진", "가격"]  # 컬럼명 지정
 
-    # 컬럼 이름 지정
-    columns_name = ["물품분류", "물품종", "순번", "상품번호", "카테고리", "상품명", "상품사진", "가격"] 
-    writer.writerow(columns_name)
+    # --- 새 엑셀파일 생성 시
+    output_wb = op.Workbook()
+    output_ws = output_wb.active
+    output_ws.append(columns_name)
+    output_wb.save(filename_xlsx)
 
-    write_csv(item_list_xlsx, imgPath, writer)
-    f.close()
-    csvtoxlsx(filename_csv, filename_xlsx)
+    write_data(item_list_xlsx, filename_xlsx, imgPath)
+    # drop_duplicates(filename_xlsx + "dptest")

@@ -17,15 +17,19 @@ toCid = {'수납/정리': '019000000000000',
 def write_data(item_list_xlsx, filename_xlsx, imgPath):
 
     input_wb = op.load_workbook(item_list_xlsx)  # 입역을 읽어올 엑셀파일
-    input_ws = input_wb.active
+    input_ws = input_wb['Sheet1']
     row_max = input_ws.max_row # 최대행값 저장
 
     output_wb = op.load_workbook(filename_xlsx)  # 결과를 저장할 엑셀파일
     output_ws = output_wb.active
 
+    type_cnt = 0
     for r in range(2, row_max+1):  # 2행부터 마지막행까지 반복
         categories = []
         type = str(input_ws.cell(row=r, column=1).value)  # 물품분류
+        if type != 'None':
+            type_cnt+=1
+
         search = str(input_ws.cell(row=r, column=2).value)  # 검색어
         if search == 'None':
             continue
@@ -40,13 +44,14 @@ def write_data(item_list_xlsx, filename_xlsx, imgPath):
             categories.append(category)
 
         print("----------" + search + "----------")
-
         num = 1  # 순번
         for category in categories:  # 해당 검색어의 카테고리 하나씩 탐색
             index1 = category.find('(')
             index2 = category.find(')')
             itemNum = int(category[index1+1:index2].replace(',', ''))
             categoryPage = int(itemNum/50) + 1
+            if categoryPage > 150:
+                categoryPage = 150
             category = category[:index1]
             try:
                 cid = toCid[category]  # 한글로 된 카테고리명을 url에서 쓰이는 cid로 변환
@@ -55,13 +60,12 @@ def write_data(item_list_xlsx, filename_xlsx, imgPath):
                 continue
 
             print("----------" + category + "----------")
-            
             for page in range(1, categoryPage+1):  # 1페이지부터 마지막 페이지까지 반복
                 print(page)
 
                 # 페이지 url에서 http 소스 읽어옴
                 url = "https://www.daisomall.co.kr/shop/search.php?nset=1&page={}&max=50&search_text={}&orderby=daiso_ranking1&cid={}&depth=1".format(page, search, cid)
-                res = requests.get(url)
+                res = requests.get(url, headers={'User-Agent':'Mozilla/5.0'})
                 res.raise_for_status()
                 soup = BeautifulSoup(res.text, "lxml")
 
@@ -116,7 +120,10 @@ def write_data(item_list_xlsx, filename_xlsx, imgPath):
 
                     # 상품번호로 해당 상품의 상세페이지 url 접속해 http 소스 읽어옴
                     itemUrl = "https://www.daisomall.co.kr/shop/goods_view.php?id={}&depth=1&search_text={}".format(itemId, search)
-                    itemRes = requests.get(itemUrl)
+                    try:
+                        itemRes = requests.get(itemUrl, headers={'User-Agent':'Mozilla/5.0'})
+                    except:
+                        continue
                     itemRes.raise_for_status()
                     soupItem = BeautifulSoup(itemRes.text, "lxml")
 
@@ -133,15 +140,47 @@ def write_data(item_list_xlsx, filename_xlsx, imgPath):
                         itemCategory = itemCategory.get_text()
                         itemCategories.append(itemCategory)
 
+                    if type == "None":
+                        type = ''
                     try:
-                        data = [type, search, num, itemNum, itemCategories[0]+">"+itemCategories[1]+">"+itemCategories[2], itemName, imgUrl, itemPrice]
+                        data = [type, None, search, num, itemNum, itemCategories[0]+">"+itemCategories[1]+">"+itemCategories[2], itemName, imgUrl, itemPrice, itemUrl]
                     except:
                         print("category error!")
                         continue
                     output_ws.append(data)
                     num+=1
-
+                    
                 output_wb.save(filename_xlsx)
+        if type_cnt >= 50:
+            output_ws = output_wb.create_sheet()
+            type_cnt = 0
+
+
+# 물품코드 로딩
+def load_code(item_list_xlsx, filename_xlsx):
+    wb = op.load_workbook(filename_xlsx)
+    ws = wb.active
+    code_wb = op.load_workbook(item_list_xlsx)
+    code_ws = code_wb['Sheet2']
+    row_max = ws.max_row
+    code_row_max = code_ws.max_row
+    
+    codeDic = {'item': 'code'}
+    for r in range(2, code_row_max+1):
+        code = str(code_ws.cell(row=r, column=1).value)
+        item = str(code_ws.cell(row=r, column=2).value)
+        desc = str(code_ws.cell(row=r, column=3).value)
+        if desc.find("삭제") != -1:
+            continue
+        codeDic[item] = code
+    print(codeDic)
+
+    for r in range(2, row_max+1):
+        temp = str(ws.cell(row=r, column=1).value)
+        # ws.cell(row=r, column=2).value = codeDic[temp]
+        # wb.save(filename_xlsx)
+        print(codeDic[temp])
+        
 
 # 중복 행 제거
 def drop_duplicates(filename_xlsx):
@@ -152,10 +191,10 @@ def drop_duplicates(filename_xlsx):
 # main 함수
 if __name__ == "__main__":
     
-    item_list_xlsx = "촬영 대상 물품_v0.1 다이소몰 크롤링 목록.xlsx"  # 읽어올 물품 리스트
-    filename_xlsx = "촬영 대상 물품_v0.1 다이소몰 크롤링 결과 리스트.xlsx"  # 결과를 저장할 xlsx 파일 이름
+    item_list_xlsx = "촬영 대상 물품_v0.8 다이소몰 크롤링 목록_카테고리.xlsx"  # 읽어올 물품 리스트
+    filename_xlsx = "촬영 대상 물품_v0.8 다이소몰 크롤링 결과 리스트2.xlsx"  # 결과를 저장할 xlsx 파일 이름
     imgPath = "item_img/"  # 이미지 파일이 저장될 경로
-    columns_name = ["물품분류", "물품종", "순번", "상품번호", "카테고리", "상품명", "상품사진", "가격"]  # 컬럼명 지정
+    columns_name = ["물품분류", "물품코드", "물품종", "순번", "상품번호", "카테고리", "상품명", "상품사진", "가격", "링크"]  # 컬럼명 지정
 
     # #--- 새 엑셀파일 생성 시
     output_wb = op.Workbook()
@@ -168,7 +207,9 @@ if __name__ == "__main__":
     # output_ws = output_wb.active
     # append_list = ["--------------------- 추가 ---------------------"]
     # output_ws.append(append_list)
+    # output_ws = output_wb.create_sheet()
     # output_wb.save(filename_xlsx)
 
     write_data(item_list_xlsx, filename_xlsx, imgPath)
     # drop_duplicates(filename_xlsx)
+    # load_code(item_list_xlsx, filename_xlsx)

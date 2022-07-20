@@ -5,7 +5,7 @@ from openpyxl.styles import Alignment
 # 다운받은 물품 이미지를 엑셀파일에 업로드
 def loadImg(excel_path, image_path, result_file):
     wb = op.load_workbook(excel_path) # 엑셀파일 열기
-    ws = wb['Sheet1']
+    ws = wb.active
  
     row_max = ws.max_row # 최대행값 저장
 
@@ -25,17 +25,23 @@ def loadImg(excel_path, image_path, result_file):
         ws.alignment = Alignment(horizontal='center', vertical='center')
 
     # 열 너비 조정
-    # ws.column_dimensions['E'].width = 10.5
-    # ws.column_dimensions['F'].width = 40
-    # ws.column_dimensions['H'].width = 16    
-    # ws.column_dimensions['G'].width = 40    
+    ws.column_dimensions['A'].width = 12
+    ws.column_dimensions['E'].width = 9
+    ws.column_dimensions['F'].width = 45
+    ws.column_dimensions['G'].width = 50    
+    ws.column_dimensions['H'].width = 15.4
+    ws.column_dimensions['J'].width = 15    
+
+
+
     wb.save(result_file)                    # 결과 파일 저장
 
 # main 함수
 if __name__ == "__main__":
 
-    excel_path = "촬영 대상 물품_v0.8 다이소몰 크롤링 결과 리스트vv.xlsx"           # 엑셀파일 경로
+    sheet_name = "식품"
+    excel_path = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 결과_식품_텍스트.xlsx"           # 엑셀파일 경로
     image_path = "item_img/"                    # 이미지 파일 경로
-    result_file = "촬영 대상 물품_v0.8 다이소몰 크롤링 결과 리스트vv.xlsx"   # 결과를 저장할 파일 이름
+    result_file = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 결과_식품_이미지.xlsx"   # 결과를 저장할 파일 이름
 
     loadImg(excel_path, image_path, result_file)

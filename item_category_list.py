@@ -3,9 +3,9 @@ import requests
 from bs4 import BeautifulSoup
 
 # 각 물품별 카테고리 현황 업로드 함수
-def loadCategory(excel_path, result_file):
+def loadCategory(excel_path, result_file, sheet_name):
     wb = op.load_workbook(excel_path) # 엑셀파일 열기
-    ws = wb.active
+    ws = wb[sheet_name]
  
     row_max = ws.max_row # 최대행값 저장
 
@@ -51,7 +51,8 @@ def loadCategory(excel_path, result_file):
 
 if __name__ == "__main__":
 
-    excel_path = "촬영 대상 물품_v0.8 다이소몰 크롤링 목록.xlsx"               # 원본 엑셀파일 이름
-    result_file = "촬영 대상 물품_v0.8 다이소몰 크롤링 목록_카테고리.xlsx"     # 결과를 저장할 엑셀 파일 이름
+    sheet_name = '문구 취미 도서'
+    excel_path = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 목록_일반물품upgrade.xlsx"               # 원본 엑셀파일 이름
+    result_file = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 목록_일반물품upgrade.xlsx"     # 결과를 저장할 엑셀 파일 이름
 
-    loadCategory(excel_path, result_file)
+    loadCategory(excel_path, result_file, sheet_name)

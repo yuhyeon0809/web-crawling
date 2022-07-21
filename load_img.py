@@ -26,22 +26,20 @@ def loadImg(excel_path, image_path, result_file):
 
     # 열 너비 조정
     ws.column_dimensions['A'].width = 12
-    ws.column_dimensions['E'].width = 9
+    ws.column_dimensions['E'].width = 10.4
     ws.column_dimensions['F'].width = 45
     ws.column_dimensions['G'].width = 50    
     ws.column_dimensions['H'].width = 15.4
     ws.column_dimensions['J'].width = 15    
-
-
 
     wb.save(result_file)                    # 결과 파일 저장
 
 # main 함수
 if __name__ == "__main__":
 
-    sheet_name = "식품"
-    excel_path = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 결과_식품_텍스트.xlsx"           # 엑셀파일 경로
-    image_path = "item_img/"                    # 이미지 파일 경로
-    result_file = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 결과_식품_이미지.xlsx"   # 결과를 저장할 파일 이름
+    sheet_name = "잡화 슈즈 명품"
+    excel_path = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 결과_잡화 슈즈 명품_텍스트.xlsx"    # 엑셀파일 경로
+    result_file = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 결과_잡화 슈즈 명품_이미지.xlsx"   # 결과를 저장할 파일 이름
+    image_path = "item_img/"                                                               # 이미지 파일 경로
 
     loadImg(excel_path, image_path, result_file)

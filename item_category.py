@@ -187,10 +187,10 @@ def drop_duplicates(filename_xlsx):
 # main 함수
 if __name__ == "__main__":
 
-    sheet_name = '잡화 슈즈 명품'
+    sheet_name = '문구 취미 도서'
     item_list_xlsx = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 목록_일반물품.xlsx"  # 읽어올 물품 리스트
-    filename_xlsx = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 결과_잡화 슈즈 명품_텍스트.xlsx"  # 결과를 저장할 xlsx 파일 이름
-    imgPath = "item_img/"  # 이미지 파일이 저장될 경로
+    filename_xlsx = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 결과_문구 취미 도서_텍스트.xlsx"  # 결과를 저장할 xlsx 파일 이름
+    imgPath = "item_img2/"  # 이미지 파일이 저장될 경로
     columns_name = ["물품분류", "물품코드", "물품종", "순번", "상품번호", "카테고리", "상품명", "상품사진", "가격", "링크"]  # 컬럼명 지정
 
     # #--- 새 엑셀파일 생성 시

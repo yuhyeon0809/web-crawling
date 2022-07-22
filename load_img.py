@@ -37,9 +37,9 @@ def loadImg(excel_path, image_path, result_file):
 # main 함수
 if __name__ == "__main__":
 
-    sheet_name = "잡화 슈즈 명품"
-    excel_path = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 결과_잡화 슈즈 명품_텍스트.xlsx"    # 엑셀파일 경로
-    result_file = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 결과_잡화 슈즈 명품_이미지.xlsx"   # 결과를 저장할 파일 이름
-    image_path = "item_img/"                                                               # 이미지 파일 경로
+    sheet_name = "스포츠 레저 여행 자동차"
+    excel_path = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 결과_스포츠 레저 여행 자동차_텍스트2.xlsx"    # 엑셀파일 경로
+    result_file = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 결과_스포츠 레저 여행 자동차_이미지2.xlsx"   # 결과를 저장할 파일 이름
+    image_path = "item_img2/"                                                               # 이미지 파일 경로
 
     loadImg(excel_path, image_path, result_file)

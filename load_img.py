@@ -32,14 +32,14 @@ def loadImg(excel_path, image_path, result_file):
     ws.column_dimensions['H'].width = 15.4
     ws.column_dimensions['J'].width = 15    
 
-    wb.save(result_file)                    # 결과 파일 저장
+    wb.save(result_file)   # 결과 파일 저장
 
 # main 함수
 if __name__ == "__main__":
 
-    sheet_name = "스포츠 레저 여행 자동차"
-    excel_path = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 결과_스포츠 레저 여행 자동차_텍스트2.xlsx"    # 엑셀파일 경로
-    result_file = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 결과_스포츠 레저 여행 자동차_이미지2.xlsx"   # 결과를 저장할 파일 이름
-    image_path = "item_img2/"                                                               # 이미지 파일 경로
+    sheet_name = "고무장갑"
+    excel_path = "고무장갑_텍스트.xlsx"    # 엑셀파일 경로
+    result_file = "고무장갑_이미지.xlsx"   # 결과를 저장할 파일 이름
+    image_path = "item_img_고무장갑/"    # 이미지 파일 경로
 
     loadImg(excel_path, image_path, result_file)

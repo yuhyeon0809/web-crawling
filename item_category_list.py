@@ -51,8 +51,8 @@ def loadCategory(excel_path, result_file, sheet_name):
 
 if __name__ == "__main__":
 
-    sheet_name = '문구 취미 도서'
-    excel_path = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 목록_일반물품upgrade.xlsx"               # 원본 엑셀파일 이름
-    result_file = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 목록_일반물품upgrade.xlsx"     # 결과를 저장할 엑셀 파일 이름
+    sheet_name = '고무장갑'
+    excel_path = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 목록_일반물품.xlsx"               # 원본 엑셀파일 이름
+    result_file = "촬영 대상 물품 분류체계_v0.1_권혁진_다이소몰 크롤링 목록_일반물품.xlsx"     # 결과를 저장할 엑셀 파일 이름
 
     loadCategory(excel_path, result_file, sheet_name)

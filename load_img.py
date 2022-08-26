@@ -9,19 +9,19 @@ def loadImg(excel_path, image_path, result_file):
  
     row_max = ws.max_row # 최대행값 저장
 
-    for r in range(2, row_max+1):           # 2행부터 마지막행까지 반복
+    for r in range(2, row_max+1):               # 2행부터 마지막행까지 반복
         search = str(ws.cell(row=r, column=3).value)
         num = str(ws.cell(row=r, column=4).value)
-        file_name = search + num + ".jpg"   # 이미지 파일 이름 (물품종+순번.png)
+        file_name = search + num + ".jpg"       # 이미지 파일 이름 (물품종(검색어)+순번.jpg)
         try:
             img = Image(image_path + file_name) # 이미지 파일 객체화
         except:
             continue
-        img.width = 128                     # 이미지 크기 조정
+        img.width = 128                         # 이미지 크기 조정
         img.height = 130
-        ws.add_image(img, "H"+str(r))       # G(r) 셀에 이미지 삽입
+        ws.add_image(img, "H"+str(r))           # H(r) 셀에 이미지 삽입
       
-        ws.row_dimensions[r].height = 100   # 행 높이 조정
+        ws.row_dimensions[r].height = 100       # 행 높이 조정
         ws.alignment = Alignment(horizontal='center', vertical='center')
 
     # 열 너비 조정
@@ -37,9 +37,9 @@ def loadImg(excel_path, image_path, result_file):
 # main 함수
 if __name__ == "__main__":
 
-    sheet_name = "고무장갑"
-    excel_path = "고무장갑_텍스트.xlsx"    # 엑셀파일 경로
-    result_file = "고무장갑_이미지.xlsx"   # 결과를 저장할 파일 이름
-    image_path = "item_img_고무장갑/"    # 이미지 파일 경로
+    sheet_name = "sheet_name"
+    input = "test.xlsx"               # 텍스트 엑셀파일 이름
+    output = "test_result_img.xlsx"   # 이미지 로딩한 결과를 저장할 파일 이름
+    image_path = "imgFolder_path/"    # 이미지 파일 경로
 
-    loadImg(excel_path, image_path, result_file)
+    loadImg(input, image_path, output)

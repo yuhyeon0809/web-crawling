@@ -19,7 +19,7 @@ def load_store(input, output):
         url = input_ws.cell(row=r, column=10).value
 
         try:
-            res = requests.get(url, headers={'User-Agent':'Mozilla/5.0'})  # url로 접속해 http 소스 받아옴
+            res = requests.get(url, headers={'User-Agent':'Mozilla/5.0'})  # url로 접속해 html 소스 받아옴
             res.raise_for_status()
             soup = BeautifulSoup(res.text, "lxml")
             sellerBox = soup.find("dl", {"class": "minishop_seller_info"})
@@ -33,7 +33,7 @@ def load_store(input, output):
         print(str(row_data[1]) + str(input_ws.cell(row=r, column=7).value) + "-----------------------" + seller)
 
         output_ws.append(row_data)
-        output_wb.save(output) # 저~장~
+        output_wb.save(output) 
 
 
 if __name__ == "__main__":

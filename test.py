@@ -6,7 +6,7 @@ from selenium.webdriver.support.select import Select
 from time import sleep
 import openpyxl as op
 
-input = "촬영 대상 물품 분류체계_v1.8_권혁진.xlsx"
+input = "input.xlsx"
 
 driver = webdriver.Chrome()
 
